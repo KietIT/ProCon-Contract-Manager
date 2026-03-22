@@ -1,0 +1,165 @@
+/* apps/web/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Theme CSS variables ──────────────────────────────────────── */
+:root {
+  --color-bg:          #0B1120;
+  --color-sidebar:     #0d1525;
+  --color-sidebar-alt: #0a0e1a;
+  --color-text-primary:   #ffffff;
+  --color-text-secondary: #94a3b8;
+  --color-border:         rgba(255,255,255,0.08);
+  --color-card:           rgba(255,255,255,0.03);
+  --color-card-border:    rgba(255,255,255,0.08);
+}
+
+html.light {
+  --color-bg:          #f0f5ff;
+  --color-sidebar:     #e4ecf9;
+  --color-sidebar-alt: #dae4f5;
+  --color-text-primary:   #0f172a;
+  --color-text-secondary: #475569;
+  --color-border:         rgba(15,23,42,0.12);
+  --color-card:           #ffffff;
+  --color-card-border:    rgba(15,23,42,0.10);
+}
+
+/* ── Light-mode global overrides ─────────────────────────────── */
+
+/* Body */
+html.light body { color: #0f172a; }
+
+/* Text — progressively lighter but all WCAG AA compliant on #f0f5ff
+   gray-300 = ~13:1 — primary/heading text
+   gray-400 = ~9.5:1 — secondary text
+   gray-500 = ~6.5:1 — muted text
+   gray-600 = ~4.6:1 — subtle/caption text                            */
+html.light .text-white             { color: #0f172a !important; }
+html.light .text-gray-300          { color: #1e293b !important; }
+html.light .text-gray-400          { color: #334155 !important; }
+html.light .text-gray-500          { color: #475569 !important; }
+html.light .text-gray-600          { color: #64748b !important; }
+
+/* opacity text — override to avoid compounding contrast loss */
+html.light .opacity-60             { opacity: 0.75 !important; }
+
+/* Borders */
+html.light .border-white\/5        { border-color: rgba(15,23,42,0.07) !important; }
+html.light .border-white\/8        { border-color: rgba(15,23,42,0.09) !important; }
+html.light .border-white\/10       { border-color: rgba(15,23,42,0.12) !important; }
+html.light .border-white\/20       { border-color: rgba(15,23,42,0.18) !important; }
+
+/* Card / panel backgrounds */
+html.light .bg-white\/2            { background-color: rgba(15,23,42,0.02) !important; }
+html.light .bg-white\/3            { background-color: rgba(255,255,255,0.80) !important; }
+html.light .bg-white\/5            { background-color: rgba(15,23,42,0.04) !important; }
+html.light .bg-white\/8            { background-color: rgba(15,23,42,0.06) !important; }
+html.light .bg-white\/10           { background-color: rgba(15,23,42,0.08) !important; }
+html.light .bg-white\/15           { background-color: rgba(15,23,42,0.10) !important; }
+html.light .bg-white\/20           { background-color: rgba(15,23,42,0.14) !important; }
+html.light .bg-black\/60           { background-color: rgba(0,0,0,0.50) !important; }
+
+/* Hardcoded sidebar hex overrides */
+html.light .bg-\[\#0d1525\]        { background-color: var(--color-sidebar)     !important; }
+html.light .bg-\[\#0a0e1a\]        { background-color: var(--color-sidebar-alt) !important; }
+html.light .bg-\[\#0d1525\]\/50    { background-color: color-mix(in srgb, var(--color-sidebar) 50%, transparent) !important; }
+html.light .bg-\[\#0a0e1a\]\/50    { background-color: color-mix(in srgb, var(--color-sidebar-alt) 50%, transparent) !important; }
+
+/* Hover utilities */
+html.light .hover\:bg-white\/5:hover  { background-color: rgba(15,23,42,0.05) !important; }
+html.light .hover\:bg-white\/3:hover  { background-color: rgba(15,23,42,0.03) !important; }
+
+/* Hover text — light mode reversal */
+html.light .hover\:text-white:hover   { color: #0f172a !important; }
+
+/* Placeholder — 3:1 minimum contrast */
+html.light .placeholder-gray-500::placeholder { color: #64748b !important; }
+html.light .placeholder-gray-600::placeholder { color: #64748b !important; }
+
+/* Inputs / selects in light mode */
+html.light input, html.light select, html.light textarea {
+  color: #0f172a;
+}
+html.light input::placeholder, html.light textarea::placeholder {
+  color: #64748b;
+}
+
+/* Date input calendar icon — adapt to theme */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.5;
+  cursor: pointer;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 0.8;
+}
+html.light input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0);
+  opacity: 0.7;
+}
+html.light input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Accent-cyan text — darken for light backgrounds */
+html.light .text-accent-cyan       { color: #0891b2 !important; }
+
+/* Red/status text — ensure readability on light bg */
+html.light .text-red-300           { color: #dc2626 !important; }
+html.light .text-red-400           { color: #dc2626 !important; }
+html.light .text-red-400\/60       { color: rgba(220,38,38,0.7) !important; }
+html.light .text-red-400\/70       { color: rgba(220,38,38,0.8) !important; }
+html.light .text-green-300         { color: #16a34a !important; }
+html.light .text-green-400         { color: #16a34a !important; }
+html.light .text-amber-400         { color: #d97706 !important; }
+html.light .text-violet-400        { color: #7c3aed !important; }
+html.light .text-blue-400          { color: #2563eb !important; }
+html.light .text-purple-300        { color: #7c3aed !important; }
+html.light .text-purple-400        { color: #6d28d9 !important; }
+
+/* Recharts tooltips */
+html.light .recharts-default-tooltip { background: #fff !important; border-color: rgba(15,23,42,0.15) !important; }
+html.light .recharts-tooltip-label   { color: #0f172a !important; }
+
+@layer utilities {
+  .bg-grid {
+    background-size: 50px 50px;
+    background-image:
+      linear-gradient(to right, rgba(37, 209, 244, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(37, 209, 244, 0.05) 1px, transparent 1px);
+  }
+
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(37, 209, 244, 0.3);
+  }
+
+  .glow-text {
+    text-shadow: 0 0 15px rgba(37, 209, 244, 0.5);
+  }
+
+  .reveal {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(30px);
+    transition: all 1s ease-out;
+  }
+
+  .reveal.active {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+
+  .particle {
+    background: #25d1f4;
+    border-radius: 50%;
+    opacity: 0.15;
+    transition: transform 0.1s ease-out;
+  }
+
+  .perspective {
+    perspective: 1000px;
+  }
+}

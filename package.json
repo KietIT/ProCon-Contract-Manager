@@ -1,0 +1,32 @@
+{
+  "name": "tar-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.28.1",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "db:migrate": "pnpm --filter api prisma migrate dev",
+    "db:seed": "pnpm --filter api prisma db seed",
+    "worker": "pnpm --filter api worker",
+    "sla-checker": "pnpm --filter api sla-checker",
+    "rag-updater": "pnpm --filter api rag-updater"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@clerk/shared",
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "msgpackr-extract",
+      "msw",
+      "prisma",
+      "tesseract.js",
+      "unrs-resolver"
+    ]
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0"
+  }
+}

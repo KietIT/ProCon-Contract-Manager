@@ -1,0 +1,132 @@
+# ===========================
+# Dependencies
+# ===========================
+node_modules/
+.pnp
+.pnp.js
+.pnp.cjs
+
+# ===========================
+# Build & Output
+# ===========================
+dist/
+build/
+out/
+.next/
+*.tsbuildinfo
+
+# ===========================
+# Turborepo
+# ===========================
+.turbo/
+
+# ===========================
+# Environment Variables
+# ===========================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# ===========================
+# Prisma
+# ===========================
+prisma/*.db
+prisma/*.db-journal
+
+# ===========================
+# Docker Volumes
+# ===========================
+postgres_data/
+redis_data/
+
+# ===========================
+# IDE & Editor
+# ===========================
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ===========================
+# OS Generated Files
+# ===========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ===========================
+# Logs
+# ===========================
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ===========================
+# Testing & Coverage
+# ===========================
+coverage/
+.nyc_output/
+*.lcov
+
+# ===========================
+# Vercel
+# ===========================
+.vercel/
+
+# ===========================
+# Claude Code / OpenCode
+# ===========================
+.claude/
+.opencode/
+CLAUDE.md
+**/CLAUDE.md
+
+# ===========================
+# Tesseract OCR data
+# ===========================
+*.traineddata
+
+# ===========================
+# Misc
+# ===========================
+.local-storage/
+test-file.txt
+*.tgz
+.cache/
+tmp/
+temp/
+nul
+NUL
+demo_commands.txt
+
+# ===========================
+# Screenshots / Images
+# ===========================
+anh/
+
+# ===========================
+# Test / Sample Files
+# ===========================
+*.pdf
+*.docx
+
+# ===========================
+# Documentation plans (auto-generated)
+# ===========================
+docs/plans/

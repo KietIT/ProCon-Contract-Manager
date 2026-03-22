@@ -1,0 +1,319 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum OrgType {
+  owner
+  epc_contractor
+  pmc
+}
+
+enum ProjectStatus {
+  planning
+  active
+  close_out
+  complete
+}
+
+enum ContractType {
+  once_off
+  frame
+}
+
+enum SpendingType {
+  opex
+  capex
+}
+
+enum Department {
+  rotating
+  instrument
+  static_dept
+  electrical
+  process_control_automation
+}
+
+enum ContractStatus {
+  draft
+  active
+  at_risk
+  complete
+  disputed
+}
+
+enum RagStatus {
+  green
+  amber
+  red
+}
+
+enum AiExtractionStatus {
+  pending
+  processing
+  review
+  confirmed
+  failed
+}
+
+enum MilestoneType {
+  completion
+  payment_trigger
+  inspection
+  handover
+  penalty_threshold
+}
+
+enum MilestoneStatus {
+  not_started
+  in_progress
+  complete
+  overdue
+  waived
+}
+
+enum MilestoneSource {
+  ai_extracted
+  manual
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
+  escalated
+  expired
+}
+
+enum CostCategory {
+  labour
+  materials
+  equipment
+  subcontract
+  other
+}
+
+enum Currency {
+  USD
+  VND
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  APPROVE
+  REJECT
+  ESCALATE
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model Organisation {
+  id        String   @id @default(uuid())
+  name      String
+  type      OrgType
+  slug      String   @unique
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Relations
+  ownedProjects     Project[]     @relation("ProjectOwner")
+  contractorContracts Contract[]  @relation("ContractorOrg")
+  users             User[]
+
+  @@map("organisations")
+}
+
+model User {
+  id       String @id @default(uuid())
+  orgId    String @map("org_id")
+  clerkId  String @unique @map("clerk_id")
+  email    String @unique
+  name     String
+  role     String // tar_manager | contract_manager | pmo | procurement | contractor
+
+  org                  Organisation        @relation(fields: [orgId], references: [id])
+  assignedMilestones   Milestone[]         @relation("MilestoneAssignee")
+  requestedApprovals   ApprovalRequest[]   @relation("ApprovalRequester")
+  assignedApprovals    ApprovalRequest[]   @relation("ApprovalAssignee")
+  escalatedApprovals   ApprovalRequest[]   @relation("ApprovalEscalation")
+  costEntries          CostEntry[]
+  auditLogs            AuditLog[]
+  uploadedVersions     ContractVersion[]   @relation("VersionUploader")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([orgId])
+  @@map("users")
+}
+
+model Project {
+  id           String        @id @default(uuid())
+  ownerOrgId   String        @map("owner_org_id")
+  name         String
+  tarStartDate DateTime      @map("tar_start_date") @db.Date
+  tarEndDate   DateTime      @map("tar_end_date") @db.Date
+  totalBudget  Decimal       @map("total_budget") @db.Decimal(18, 2)
+  currency     Currency      @default(USD)
+  status       ProjectStatus @default(planning)
+
+  ownerOrg  Organisation @relation("ProjectOwner", fields: [ownerOrgId], references: [id])
+  contracts Contract[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("projects")
+}
+
+model Contract {
+  id                  String             @id @default(uuid())
+  projectId           String             @map("project_id")
+  contractorOrgId     String             @map("contractor_org_id")
+  contractNumber      String             @map("contract_number")
+  type                ContractType
+  spendingType        SpendingType       @default(opex) @map("spending_type")
+  department          Department         @default(rotating) @map("department")
+  contractValue       Decimal            @map("contract_value") @db.Decimal(18, 2)
+  approvedValue       Decimal?           @map("approved_value") @db.Decimal(18, 2)
+  startDate           DateTime           @map("start_date") @db.Date
+  endDate             DateTime           @map("end_date") @db.Date
+  status              ContractStatus     @default(draft)
+  ragStatus           RagStatus          @default(green) @map("rag_status")
+  fileKey             String?            @map("file_key")
+  fileMimeType        String?            @map("file_mime_type")
+  aiExtractionStatus  AiExtractionStatus @default(pending) @map("ai_extraction_status")
+  aiExtractionData    Json?              @map("ai_extraction_data")
+  currentVersion      Int                @default(1) @map("current_version")
+
+  project       Project            @relation(fields: [projectId], references: [id])
+  contractorOrg Organisation       @relation("ContractorOrg", fields: [contractorOrgId], references: [id])
+  milestones    Milestone[]
+  costEntries   CostEntry[]
+  versions      ContractVersion[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([projectId])
+  @@index([status])
+  @@map("contracts")
+}
+
+model ContractVersion {
+  id                 String             @id @default(uuid())
+  contractId         String             @map("contract_id")
+  versionNumber      Int                @map("version_number")
+  fileKey            String             @map("file_key")
+  fileMimeType       String             @map("file_mime_type")
+  changeNote         String?            @map("change_note")
+  uploadedById       String             @map("uploaded_by_id")
+  aiExtractionStatus AiExtractionStatus @default(pending) @map("ai_extraction_status")
+  aiExtractionData   Json?              @map("ai_extraction_data")
+
+  contract   Contract @relation(fields: [contractId], references: [id])
+  uploadedBy User     @relation("VersionUploader", fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([contractId])
+  @@map("contract_versions")
+}
+
+model Milestone {
+  id               String          @id @default(uuid())
+  contractId       String          @map("contract_id")
+  title            String
+  description      String
+  type             MilestoneType
+  dueDate          DateTime        @map("due_date") @db.Date
+  assignedToUserId String?         @map("assigned_to_user_id")
+  status           MilestoneStatus @default(not_started)
+  completedAt      DateTime?       @map("completed_at")
+  source           MilestoneSource @default(ai_extracted)
+  aiConfidence     Float?          @map("ai_confidence")
+  requiresApproval Boolean         @default(true) @map("requires_approval")
+
+  contract         Contract          @relation(fields: [contractId], references: [id])
+  assignedTo       User?             @relation("MilestoneAssignee", fields: [assignedToUserId], references: [id])
+  approvalRequests ApprovalRequest[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@index([contractId])
+  @@index([dueDate])
+  @@map("milestones")
+}
+
+model ApprovalRequest {
+  id                  String         @id @default(uuid())
+  milestoneId         String         @map("milestone_id")
+  requestedByUserId   String         @map("requested_by_user_id")
+  approverUserId      String         @map("approver_user_id")
+  status              ApprovalStatus @default(pending)
+  slaDeadline         DateTime       @map("sla_deadline")
+  decidedAt           DateTime?      @map("decided_at")
+  comments            String?
+  escalatedToUserId   String?        @map("escalated_to_user_id")
+
+  milestone     Milestone @relation(fields: [milestoneId], references: [id])
+  requestedBy   User      @relation("ApprovalRequester", fields: [requestedByUserId], references: [id])
+  approver      User      @relation("ApprovalAssignee", fields: [approverUserId], references: [id])
+  escalatedTo   User?     @relation("ApprovalEscalation", fields: [escalatedToUserId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([approverUserId, status])
+  @@index([milestoneId])
+  @@map("approval_requests")
+}
+
+model CostEntry {
+  id                String       @id @default(uuid())
+  contractId        String       @map("contract_id")
+  entryDate         DateTime     @map("entry_date") @db.Date
+  amount            Decimal      @db.Decimal(18, 2)
+  category          CostCategory
+  submittedByUserId String       @map("submitted_by_user_id")
+  approved          Boolean      @default(false)
+
+  contract    Contract @relation(fields: [contractId], references: [id])
+  submittedBy User     @relation(fields: [submittedByUserId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([contractId])
+  @@map("cost_entries")
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  userId     String      @map("user_id")
+  action     AuditAction
+  entityType String      @map("entity_type")
+  entityId   String      @map("entity_id")
+  changes    Json?
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
